@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
+  swcMinify: false,
   images: {
     remotePatterns: [
       {
@@ -19,9 +21,8 @@ const nextConfig = {
         hostname: 'ipfs.io',
       },
     ],
-    unoptimized: true, // Required for IPFS images
+    unoptimized: true,
   },
-  // Optimize build for Vercel
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -31,11 +32,18 @@ const nextConfig = {
         tls: false,
       };
     }
+    // Reduce memory usage
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          default: false,
+          vendors: false,
+        },
+      },
+    };
     return config;
-  },
-  // Exclude unnecessary files from build
-  experimental: {
-    optimizePackageImports: ['@story-protocol/core-sdk'],
   },
 }
 
