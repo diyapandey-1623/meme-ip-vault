@@ -195,65 +195,21 @@ export default function UploadPage() {
     setMintingStatus('uploading');
 
     try {
-      // Step 1: Try to upload image to IPFS first to get a public URL
-      console.log('📤 Starting IPFS upload process...');
+      // Step 1: Upload to IPFS and register on blockchain via API
+      console.log('📤 Starting upload process...');
       console.log('📁 File details:', {
         name: selectedFile.name,
         size: selectedFile.size,
         type: selectedFile.type,
-        lastModified: selectedFile.lastModified
       });
       
-      let publicImageUrl = '';
-      
-      try {
-        const ipfsFormData = new FormData();
-        ipfsFormData.append('file', selectedFile);
-        
-        console.log('📤 Uploading to IPFS via Pinata...');
-
-        const ipfsResponse = await fetch('/api/upload-ipfs', {
-          method: 'POST',
-          body: ipfsFormData,
-        });
-
-        console.log('📡 IPFS API response status:', ipfsResponse.status);
-        
-        if (!ipfsResponse.ok) {
-          const errorData = await ipfsResponse.json();
-          console.error('❌ IPFS upload failed:', errorData);
-          throw new Error(errorData.error || 'Failed to upload image to IPFS');
-        }
-        
-        const ipfsData = await ipfsResponse.json();
-        console.log('📋 IPFS API response data:', ipfsData);
-
-        if (!ipfsData.ipfsUrl) {
-          throw new Error('IPFS response missing ipfsUrl');
-        }
-
-        publicImageUrl = ipfsData.ipfsUrl; // ipfs://CID format
-        console.log('✅ Image successfully uploaded to IPFS!');
-        console.log('🔗 IPFS URI:', publicImageUrl);
-        console.log('🔗 IPFS Hash:', ipfsData.ipfsHash);
-        console.log('🌐 Gateway URL:', ipfsData.gatewayUrl);
-      } catch (ipfsError) {
-        console.error('❌ IPFS upload failed:', ipfsError);
-        throw new Error(`Image must be uploaded to IPFS before minting: ${ipfsError instanceof Error ? ipfsError.message : 'Unknown error'}`);
-      }
-
-      // Step 2: Upload meme metadata to database
       const formDataToSend = new FormData();
       formDataToSend.append('image', selectedFile);
       formDataToSend.append('title', formData.title);
       formDataToSend.append('description', formData.description);
       formDataToSend.append('license', formData.license);
-      formDataToSend.append('inMarketplace', formData.inMarketplace.toString());
       formDataToSend.append('creatorName', formData.creatorName || 'Anonymous');
-      formDataToSend.append('registerOnChain', 'false'); // Don't register on server side
-      formDataToSend.append('ipfsUrl', publicImageUrl); // Save IPFS URL or placeholder
-      formDataToSend.append('isCollaboration', formData.isCollaboration.toString());
-      formDataToSend.append('collaborators', JSON.stringify(collaborators.filter(c => c.name && c.walletAddress)));
+      formDataToSend.append('registerOnChain', 'false'); // We'll handle blockchain registration in frontend
 
       const uploadResponse = await fetch('/api/memes', {
         method: 'POST',
@@ -266,11 +222,18 @@ export default function UploadPage() {
         throw new Error(uploadData.error || 'Failed to upload meme');
       }
 
-      const uploadedMemeId = uploadData.meme.id;
-      console.log('📁 Meme record created:', uploadedMemeId);
-      setMemeId(uploadedMemeId);
+      console.log('✅ Upload successful!', uploadData);
+      
+      // Extract IPFS data from response
+      const publicImageUrl = uploadData.data.ipfs.url; // ipfs://CID format
+      const ipfsHash = uploadData.data.ipfs.hash;
+      const gatewayUrl = uploadData.data.ipfs.gatewayUrl;
+      
+      console.log('🔗 IPFS URI:', publicImageUrl);
+      console.log('🔗 IPFS Hash:', ipfsHash);
+      console.log('🌐 Gateway URL:', gatewayUrl);
 
-      // Step 3: Mint NFT and register as IP Asset
+      // Step 2: Mint NFT and register as IP Asset
       console.log('🔗 Starting blockchain registration...');
       console.log('⚠️ Please confirm the transaction in MetaMask');
       setMintingStatus('registering');
@@ -287,53 +250,32 @@ export default function UploadPage() {
         throw new Error(mintResult.error || 'Blockchain registration failed');
       }
 
-      // ALWAYS save blockchain data when mint succeeds
+      // Success!
       console.log('✅ Blockchain registration successful!');
       console.log('🆔 IP Asset ID:', mintResult.ipId);
       console.log('📝 Transaction Hash:', mintResult.txHash);
       console.log('🎫 Token ID:', mintResult.tokenId);
       
-      // Update state immediately
       setMintResult(mintResult);
       setMintingStatus('success');
 
-      // Step 4: Save blockchain info to database
-      try {
-        console.log('💾 Saving IP:', mintResult.ipId);
-        console.log('💾 Saving txHash:', mintResult.txHash);
-        console.log('💾 Saving tokenId:', mintResult.tokenId);
-        
-        const updateResponse = await fetch(`/api/memes/${uploadedMemeId}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ipId: mintResult.ipId,
-            txHash: mintResult.txHash,
-            tokenId: mintResult.tokenId,
-            status: 'on-chain',
-            ipfsUrl: publicImageUrl,
-          }),
-        });
+      // Show success message with all data
+      alert(`
+✅ Meme Uploaded Successfully!
 
-        if (!updateResponse.ok) {
-          console.warn('⚠️ Database update failed, but blockchain registration succeeded');
-          const errorData = await updateResponse.json();
-          console.error('❌ Database error details:', errorData);
-        } else {
-          const updateData = await updateResponse.json();
-          console.log('✅ Database updated with blockchain info:', updateData);
-        }
-      } catch (updateErr) {
-        console.error('❌ Database update error:', updateErr);
-        // Don't throw - blockchain registration was successful
-      }
+📝 Title: ${formData.title}
+🔗 IPFS: ${ipfsHash}
+🌐 View: ${gatewayUrl}
 
-      // Show success for 3 seconds before redirecting
-      setTimeout(() => {
-        router.push(`/certificate/${uploadedMemeId}`);
-      }, 3000);
+🔗 Blockchain:
+🆔 IP ID: ${mintResult.ipId}
+📝 TX: ${mintResult.txHash}
+🎫 Token: ${mintResult.tokenId}
+
+View on Story Explorer:
+https://explorer.story.foundation
+      `.trim());
+
     } catch (err) {
       console.error('❌ Upload error:', err);
       setError(err instanceof Error ? err.message : 'Failed to upload meme');
