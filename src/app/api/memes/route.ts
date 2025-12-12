@@ -177,11 +177,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-  } catch (error) {
-    console.error('Error creating meme:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create meme' },
-      { status: 500 }
-    );
-  }
-}
