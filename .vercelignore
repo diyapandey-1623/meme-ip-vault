@@ -1,0 +1,6 @@
+public/uploads
+*.db
+*.db-journal
+node_modules
+.env
+.env.local

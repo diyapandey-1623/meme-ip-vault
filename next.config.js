@@ -21,6 +21,22 @@ const nextConfig = {
     ],
     unoptimized: true, // Required for IPFS images
   },
+  // Optimize build for Vercel
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+      };
+    }
+    return config;
+  },
+  // Exclude unnecessary files from build
+  experimental: {
+    optimizePackageImports: ['@story-protocol/core-sdk'],
+  },
 }
 
 module.exports = nextConfig
