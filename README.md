@@ -267,39 +267,12 @@ meme-ip-vault/
 
 ---
 
-##  Screenshots
-
-> **Add screenshots here to showcase your project:**
-
-### Homepage
-![Homepage](./screenshots/homepage.png)
-
-### AI Generator
-![Generator](./screenshots/generator.png)
-
-### Marketplace
-![Marketplace](./screenshots/marketplace.png)
-
-### Certificate Page
-![Certificate](./screenshots/certificate.png)
-
----
-
 ##  Acknowledgments
 
 - **[Story Protocol](https://www.storyprotocol.xyz/)** – For the IP blockchain infrastructure
 - **[Pinata](https://pinata.cloud/)** – For IPFS hosting services
 - **[OpenAI](https://openai.com/)** – For AI image generation capabilities
 - **[Next.js Team](https://nextjs.org/)** – For the amazing framework
-
----
-
-## 📬 Contact
-
-For questions or feedback, reach out:
-
-- **GitHub Issues:** [github.com/yourusername/meme-ip-vault/issues](https://github.com/yourusername/meme-ip-vault/issues)
-- **Twitter:** [@yourusername](https://twitter.com/yourusername)
 
 ---
 
