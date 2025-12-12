@@ -76,6 +76,46 @@ export async function POST(request: NextRequest) {
       file
     );
 
+    // Upload to IPFS for Story Protocol
+    let ipfsHash = '';
+    let ipfsGatewayUrl = '';
+    
+    if (registerOnChain) {
+      try {
+        console.log('📤 Uploading to IPFS...');
+        const jwtToken = process.env.PINATA_JWT;
+        
+        if (jwtToken) {
+          const pinataFormData = new FormData();
+          pinataFormData.append('file', file);
+          
+          const metadata = JSON.stringify({
+            name: file.name,
+            keyvalues: { type: 'meme', title, uploadedAt: new Date().toISOString() }
+          });
+          pinataFormData.append('pinataMetadata', metadata);
+          
+          const ipfsResponse = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${jwtToken}` },
+            body: pinataFormData,
+          });
+          
+          if (ipfsResponse.ok) {
+            const ipfsData = await ipfsResponse.json();
+            ipfsHash = ipfsData.IpfsHash;
+            ipfsGatewayUrl = `https://gateway.pinata.cloud/ipfs/${ipfsHash}`;
+            console.log('✅ IPFS Upload Success:', ipfsGatewayUrl);
+          } else {
+            console.warn('⚠️ IPFS upload failed, continuing without it');
+          }
+        }
+      } catch (ipfsError) {
+        console.error('❌ IPFS upload error:', ipfsError);
+        // Continue without IPFS
+      }
+    }
+
     // Check for duplicates
     const allMemes = await prisma.meme.findMany({
       select: { id: true, hash: true, title: true },
@@ -100,7 +140,7 @@ export async function POST(request: NextRequest) {
         inMarketplace,
         creatorName,
         isCollaboration,
-        ipfsUrl,
+        ipfsUrl: ipfsGatewayUrl || ipfsUrl, // Use uploaded IPFS URL or provided one
         collaborators: {
           create: collaboratorsData.map(c => ({
             name: c.name,
