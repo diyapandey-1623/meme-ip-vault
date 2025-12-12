@@ -120,16 +120,24 @@ export function compareHashes(hash1: string, hash2: string): number {
 }
 
 /**
- * Save uploaded file to disk
+ * Save uploaded file to disk (only in development)
  */
 export async function saveUploadedFile(
   file: File,
   subfolder: string = 'originals'
 ): Promise<string> {
+  // Skip local file storage in production (serverless has read-only filesystem)
+  if (process.env.NODE_ENV === 'production') {
+    // Return a placeholder path - actual storage is in IPFS
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const ext = path.extname(file.name);
+    return `/uploads/${subfolder}/${uniqueSuffix}${ext}`;
+  }
+
   const bytes = await file.arrayBuffer();
   const buffer = Buffer.from(bytes);
 
-  // Create uploads directory if it doesn't exist
+  // Create uploads directory if it doesn't exist (development only)
   const uploadDir = path.join(process.cwd(), 'public', 'uploads', subfolder);
   await fs.mkdir(uploadDir, { recursive: true });
 
