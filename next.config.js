@@ -9,6 +9,10 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  experimental: {
+    outputFileTracingRoot: undefined,
+  },
+  outputFileTracing: false,
 }
 
 module.exports = nextConfig
