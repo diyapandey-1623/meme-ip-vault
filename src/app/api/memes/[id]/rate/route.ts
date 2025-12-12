@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 export async function POST(
   request: NextRequest,
@@ -108,11 +107,13 @@ export async function POST(
   }
 }
 
-// GET - Get rating info
+// GET - Get rating info (disabled - no database)
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  return NextResponse.json({ averageRating: 0, totalRatings: 0, userRating: null });
+  /*
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');

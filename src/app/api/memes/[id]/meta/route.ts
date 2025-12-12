@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  return NextResponse.json({ 
+    likes: 0,
+    averageRating: 0,
+    totalRatings: 0,
+    userLiked: false,
+    userRating: null
+  });
+  /*
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');

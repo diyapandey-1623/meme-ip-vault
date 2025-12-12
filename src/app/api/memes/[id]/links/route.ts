@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
-// POST - Add usage link to meme
+// POST - Add usage link (disabled - no database)
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  return NextResponse.json({ 
+    error: 'Database disabled',
+    message: 'Usage tracking requires database.'
+  }, { status: 501 });
+  /*
   try {
     const { url } = await request.json();
 
