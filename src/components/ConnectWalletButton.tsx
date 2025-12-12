@@ -63,7 +63,7 @@ export default function ConnectWalletButton() {
     }
   };
 
-  const connectWallet = async (walletType: 'metamask' | 'coinbase' | 'walletconnect') => {
+  const connectWallet = async () => {
     if (typeof window === 'undefined') return;
 
     setIsConnecting(true);
@@ -73,35 +73,16 @@ export default function ConnectWalletButton() {
       // Remove disconnect flag when user explicitly connects
       localStorage.removeItem('wallet_disconnected');
       
-      let accounts: string[] = [];
-
-      if (walletType === 'metamask') {
-        if (!window.ethereum) {
-          alert('MetaMask is not installed. Redirecting to download page...');
-          window.open('https://metamask.io/download/', '_blank');
-          return;
-        }
-        
-        accounts = await window.ethereum.request({
-          method: 'eth_requestAccounts',
-        }) as string[];
-        
-      } else if (walletType === 'coinbase') {
-        // Check for Coinbase Wallet
-        if (!window.ethereum || !(window.ethereum as any)?.isCoinbaseWallet) {
-          alert('Coinbase Wallet not detected. Please install Coinbase Wallet extension.');
-          window.open('https://www.coinbase.com/wallet/downloads', '_blank');
-          return;
-        }
-        
-        accounts = await window.ethereum.request({
-          method: 'eth_requestAccounts',
-        }) as string[];
-        
-      } else if (walletType === 'walletconnect') {
-        alert('WalletConnect integration coming soon! Please use MetaMask or Coinbase Wallet for now.');
+      if (!window.ethereum) {
+        alert('MetaMask is not installed. Redirecting to download page...');
+        window.open('https://metamask.io/download/', '_blank');
+        setIsConnecting(false);
         return;
       }
+      
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts',
+      }) as string[];
 
       if (accounts.length > 0) {
         setWalletAddress(accounts[0]);
@@ -336,14 +317,14 @@ export default function ConnectWalletButton() {
                     </svg>
                   </button>
                 </div>
-                <p className="text-gray-400 mt-2 text-sm">Choose your preferred wallet to connect</p>
+                <p className="text-gray-400 mt-2 text-sm">Connect with MetaMask to get started</p>
               </div>
 
               {/* Wallet Options */}
               <div className="p-6 space-y-3">
                 {/* MetaMask */}
                 <button
-                  onClick={() => connectWallet('metamask')}
+                  onClick={() => connectWallet()}
                   disabled={isConnecting}
                   className="w-full p-4 bg-gradient-to-r from-orange-500/10 to-yellow-500/10 border border-orange-500/30 rounded-xl hover:border-orange-500 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -356,46 +337,6 @@ export default function ConnectWalletButton() {
                       <p className="text-gray-400 text-sm">Connect with MetaMask wallet</p>
                     </div>
                     <svg className="w-5 h-5 text-gray-400 group-hover:text-orange-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-
-                {/* Coinbase Wallet */}
-                <button
-                  onClick={() => connectWallet('coinbase')}
-                  disabled={isConnecting}
-                  className="w-full p-4 bg-gradient-to-r from-blue-500/10 to-blue-600/10 border border-blue-500/30 rounded-xl hover:border-blue-500 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <span className="text-2xl">💼</span>
-                    </div>
-                    <div className="text-left flex-1">
-                      <h3 className="text-white font-semibold text-lg">Coinbase Wallet</h3>
-                      <p className="text-gray-400 text-sm">Connect with Coinbase Wallet</p>
-                    </div>
-                    <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-
-                {/* WalletConnect */}
-                <button
-                  onClick={() => connectWallet('walletconnect')}
-                  disabled={isConnecting}
-                  className="w-full p-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-xl hover:border-purple-500 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <span className="text-2xl">🔗</span>
-                    </div>
-                    <div className="text-left flex-1">
-                      <h3 className="text-white font-semibold text-lg">WalletConnect</h3>
-                      <p className="text-gray-400 text-sm">Scan with mobile wallet</p>
-                    </div>
-                    <svg className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </div>
