@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Meme {
+  id                  String   @id @default(cuid())
+  title               String
+  description         String
+  imageUrl            String
+  watermarkedImageUrl String
+  hash                String
+  ipfsUrl             String?  // IPFS URL for public blockchain access
+  timestamp           DateTime @default(now())
+  license             String
+  inMarketplace       Boolean  @default(false)
+  creatorName         String   @default("Anonymous")
+  
+  // Collaboration
+  isCollaboration     Boolean  @default(false)
+  
+  // Story Protocol Integration
+  ipId                String?  // Story Protocol IP Asset ID
+  ipTxHash            String?  // Transaction hash for IP registration
+  licenseTermsId      String?  // License terms ID on Story Protocol
+  onChain             Boolean  @default(false) // Whether registered on-chain
+  
+  // Social Features
+  likesCount          Int      @default(0)
+  ratingSum           Int      @default(0)
+  ratingCount         Int      @default(0)
+  averageRating       Float    @default(0)
+  verified            Boolean  @default(false)
+  
+  usageLinks          UsageLink[]
+  collaborators       Collaborator[]
+  likes               Like[]
+  ratings             Rating[]
+
+  @@index([hash])
+  @@index([license])
+  @@index([inMarketplace])
+  @@index([ipId])
+}
+
+model Collaborator {
+  id              String   @id @default(cuid())
+  name            String
+  walletAddress   String
+  addedAt         DateTime @default(now())
+  memeId          String
+  meme            Meme     @relation(fields: [memeId], references: [id], onDelete: Cascade)
+
+  @@index([memeId])
+  @@index([walletAddress])
+}
+
+model UsageLink {
+  id        String   @id @default(cuid())
+  url       String
+  addedAt   DateTime @default(now())
+  memeId    String
+  meme      Meme     @relation(fields: [memeId], references: [id], onDelete: Cascade)
+
+  @@index([memeId])
+}
+
+model Like {
+  id              String   @id @default(cuid())
+  userId          String   // Wallet address
+  createdAt       DateTime @default(now())
+  memeId          String
+  meme            Meme     @relation(fields: [memeId], references: [id], onDelete: Cascade)
+
+  @@unique([memeId, userId])
+  @@index([memeId])
+  @@index([userId])
+}
+
+model Rating {
+  id              String   @id @default(cuid())
+  userId          String   // Wallet address
+  value           Int      // 1-5 stars
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  memeId          String
+  meme            Meme     @relation(fields: [memeId], references: [id], onDelete: Cascade)
+
+  @@unique([memeId, userId])
+  @@index([memeId])
+  @@index([userId])
+}

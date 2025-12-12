@@ -1,0 +1,39 @@
+{
+  "name": "meme-ip-vault",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "check-balance": "tsx scripts/checkBalance.ts"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@coinbase/wallet-sdk": "^3.7.2",
+    "@prisma/client": "^5.22.0",
+    "@story-protocol/core-sdk": "^1.4.2",
+    "ethers": "^6.9.0",
+    "next": "14.0.4",
+    "next-auth": "^4.24.13",
+    "openai": "^6.10.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "sharp": "^0.33.1",
+    "viem": "^2.41.2",
+    "web3modal": "^1.9.12"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "postcss": "^8",
+    "prisma": "^5.7.0",
+    "tailwindcss": "^3.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5"
+  }
+}

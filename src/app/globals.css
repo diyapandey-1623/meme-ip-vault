@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-gray-800;
+  }
+  
+  html {
+    @apply bg-black text-sm;
+  }
+  
+  body {
+    @apply bg-black text-white text-sm;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+.card {
+  @apply bg-gray-900 rounded-lg shadow-md p-6 border border-cyan-500/30;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold py-3 px-6 rounded-lg hover:from-cyan-400 hover:to-purple-500 transition-all duration-300 shadow-lg;
+}
+
+.btn-secondary {
+  @apply bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 px-6 rounded-lg hover:from-cyan-600 hover:to-blue-600 transition-all duration-300 shadow-lg;
+}
+
+.input {
+  @apply w-full px-4 py-2 bg-gray-900 border border-cyan-500/30 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500;
+}
+
+.label {
+  @apply block text-sm font-bold mb-2 text-cyan-400;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes neon-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    text-shadow: 
+      0 0 10px #00f3ff,
+      0 0 20px #00f3ff,
+      0 0 30px #00f3ff,
+      0 0 40px #00f3ff,
+      0 0 70px #00f3ff,
+      0 0 80px #00f3ff;
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+.neon-title {
+  animation: neon-flicker 4s linear infinite;
+  position: relative;
+}
+
+.neon-title::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(transparent, rgba(0, 243, 255, 0.5), transparent);
+  animation: scanline 3s linear infinite;
+}
+
+/* Wallet Modal Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
