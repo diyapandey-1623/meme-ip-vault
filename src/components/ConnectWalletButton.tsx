@@ -88,15 +88,15 @@ export default function ConnectWalletButton() {
         
       } else if (walletType === 'coinbase') {
         // Check for Coinbase Wallet
-        if ((window.ethereum as any)?.isCoinbaseWallet) {
-          accounts = await window.ethereum.request({
-            method: 'eth_requestAccounts',
-          }) as string[];
-        } else {
+        if (!window.ethereum || !(window.ethereum as any)?.isCoinbaseWallet) {
           alert('Coinbase Wallet not detected. Please install Coinbase Wallet extension.');
           window.open('https://www.coinbase.com/wallet/downloads', '_blank');
           return;
         }
+        
+        accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts',
+        }) as string[];
         
       } else if (walletType === 'walletconnect') {
         alert('WalletConnect integration coming soon! Please use MetaMask or Coinbase Wallet for now.');
