@@ -13,6 +13,10 @@ const nextConfig = {
     outputFileTracingRoot: undefined,
   },
   outputFileTracing: false,
+  productionBrowserSourceMaps: false,
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
+  },
 }
 
 module.exports = nextConfig
