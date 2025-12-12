@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 
 export default function ExplorePage() {
@@ -41,14 +40,7 @@ export default function ExplorePage() {
     </div>
   );
 }
-import Link from 'next/link';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import LikeButton from '@/components/LikeButton';
-import StarRating from '@/components/StarRating';
-import VerifiedBadge from '@/components/VerifiedBadge';
 
-interface Meme {
   id: string;
   title: string;
   description: string;
