@@ -26,14 +26,3 @@ export const LICENSE_TYPES = {
 } as const;
 
 export type LicenseType = typeof LICENSE_TYPES[keyof typeof LICENSE_TYPES];
-
-// Ethereum window object
-declare global {
-  interface Window {
-    ethereum?: {
-      request: (args: { method: string; params?: unknown[] }) => Promise<unknown>;
-      on: (event: string, callback: (...args: unknown[]) => void) => void;
-      removeListener: (event: string, callback: (...args: unknown[]) => void) => void;
-    };
-  }
-}
