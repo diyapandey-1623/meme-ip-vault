@@ -126,8 +126,15 @@ export async function saveUploadedFile(
   file: File,
   subfolder: string = 'originals'
 ): Promise<string> {
-  // Skip local file storage in production (serverless has read-only filesystem)
-  if (process.env.NODE_ENV === 'production') {
+  // Skip local file storage in production/serverless (read-only filesystem)
+  // Check multiple indicators for production environment
+  const isProduction = 
+    process.env.NODE_ENV === 'production' || 
+    process.env.VERCEL === '1' || 
+    process.env.NETLIFY === 'true' ||
+    !process.cwd().includes('C:\\') && !process.cwd().includes('c:\\'); // Not on Windows local dev
+  
+  if (isProduction) {
     // Return a placeholder path - actual storage is in IPFS
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     const ext = path.extname(file.name);
